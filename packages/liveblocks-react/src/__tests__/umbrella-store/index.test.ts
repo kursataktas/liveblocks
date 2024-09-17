@@ -32,15 +32,15 @@ describe("Umbrella Store", () => {
     expect(store.getThreads()).toBe(store.getThreads());
 
     // Sync async-results getter
-    // TODO Add check here for strict-equality of the OK-state, which currently isn't strictly-equal and the selectors/isEqual functions are still "working around" that
+    // XXX Add check here for strict-equality of the OK-state, which currently isn't strictly-equal and the selectors/isEqual functions are still "working around" that
     expect(store.getInboxNotificationsAsync()).toBe(
       store.getInboxNotificationsAsync()
     );
-    // TODO Add check here for strict-equality of the OK-state, which currently isn't strictly-equal and the selectors/isEqual functions are still "working around" that
+    // XXX Add check here for strict-equality of the OK-state, which currently isn't strictly-equal and the selectors/isEqual functions are still "working around" that
     expect(store.getNotificationSettingsAsync("room-a")).toBe(
       store.getNotificationSettingsAsync("room-a")
     );
-    // TODO Add check here for strict-equality of the OK-state, which currently isn't strictly-equal and the selectors/isEqual functions are still "working around" that
+    // XXX Add check here for strict-equality of the OK-state, which currently isn't strictly-equal and the selectors/isEqual functions are still "working around" that
     expect(store.getVersionsAsync("room-a")).toBe(
       store.getVersionsAsync("room-a")
     );

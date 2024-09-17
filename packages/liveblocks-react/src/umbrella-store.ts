@@ -28,6 +28,8 @@ import {
 
 import { isMoreRecentlyUpdated } from "./lib/compare";
 
+// XXX Split this up into separate optimistic update queues?
+// XXX This can help reduce number of re-renders of unrelated updates
 type OptimisticUpdate<M extends BaseMetadata> =
   | CreateThreadOptimisticUpdate<M>
   | DeleteThreadOptimisticUpdate
@@ -160,15 +162,15 @@ type QueryState = AsyncResult<undefined>;
 const QUERY_STATE_LOADING = Object.freeze({ isLoading: true });
 const QUERY_STATE_OK = Object.freeze({ isLoading: false, data: undefined });
 
-// TODO Stop exporting this constant!
+// XXX Stop exporting this constant!
 export const INBOX_NOTIFICATIONS_QUERY = "INBOX_NOTIFICATIONS";
 
-// TODO Stop exporting this helper!
+// XXX Stop exporting this helper!
 export function makeNotificationSettingsQueryKey(roomId: string) {
   return `${roomId}:NOTIFICATION_SETTINGS`;
 }
 
-// TODO Stop exporting this helper!
+// XXX Stop exporting this helper!
 export function makeVersionsQueryKey(roomId: string) {
   return `${roomId}-VERSIONS`;
 }
@@ -194,7 +196,12 @@ export type UmbrellaStoreState<M extends BaseMetadata> = {
    * e.g. 'room-abc-{"color":"red"}'  - ok
    * e.g. 'room-abc-{}'               - loading
    */
-  // TODO Query state should not be exposed publicly by the store!
+  // XXX Query state should not be exposed publicly by the store!
+  // XXX Requires re-writing the following hooks first:
+  //     - useThreads
+  //     - useThreadsSuspense
+  //     - useUserThreadsSuspense_experimental
+  //     - useUserThreads_experimental
   queries: Record<string, QueryState>;
 
   /**
@@ -287,7 +294,8 @@ export class UmbrellaStore<M extends BaseMetadata> {
   }
 
   public getInboxNotifications(): UmbrellaStoreState<M> {
-    // TODO Now that we have getInboxNotificationsAsync, can we get rid of this method already?
+    // XXX Now that we have getInboxNotificationsAsync, can we get rid of this method already?
+    // XXX We first need to figure out how to re-write useInboxNotificationThread_withClient
     return this.get();
   }
 
@@ -308,7 +316,7 @@ export class UmbrellaStore<M extends BaseMetadata> {
     }
 
     const inboxNotifications = this.get().inboxNotifications;
-    // TODO Memoize this value to ensure stable result, so we won't have to use the selector and isEqual functions!
+    // XXX Memoize this value to ensure stable result, so we won't have to use the selector and isEqual functions!
     return { isLoading: false, inboxNotifications };
   }
 
@@ -327,7 +335,7 @@ export class UmbrellaStore<M extends BaseMetadata> {
       return query;
     }
 
-    // TODO Memoize this value to ensure stable result, so we won't have to use the selector and isEqual functions!
+    // XXX Memoize this value to ensure stable result, so we won't have to use the selector and isEqual functions!
     return {
       isLoading: false,
       settings: nn(state.notificationSettingsByRoomId[roomId]),
@@ -348,7 +356,7 @@ export class UmbrellaStore<M extends BaseMetadata> {
       return query;
     }
 
-    // TODO Memoize this value to ensure stable result, so we won't have to use the selector and isEqual functions!
+    // XXX Memoize this value to ensure stable result, so we won't have to use the selector and isEqual functions!
     return {
       isLoading: false,
       versions: nn(state.versionsByRoomId[roomId]),
@@ -370,27 +378,27 @@ export class UmbrellaStore<M extends BaseMetadata> {
    * @private Only used by the E2E test suite.
    */
   public _subscribeOptimisticUpdates(callback: () => void): () => void {
-    // TODO Make this actually only update when optimistic updates are changed
+    // XXX Make this actually only update when optimistic updates are changed
     return this.subscribe(callback);
   }
 
   public subscribeThreads(callback: () => void): () => void {
-    // TODO Make this actually only update when threads are invalidated
+    // XXX Make this actually only update when threads are invalidated
     return this.subscribe(callback);
   }
 
   public subscribeInboxNotifications(callback: () => void): () => void {
-    // TODO Make this actually only update when inbox notifications are invalidated
+    // XXX Make this actually only update when inbox notifications are invalidated
     return this.subscribe(callback);
   }
 
   public subscribeNotificationSettings(callback: () => void): () => void {
-    // TODO Make this actually only update when notification settings are invalidated
+    // XXX Make this actually only update when notification settings are invalidated
     return this.subscribe(callback);
   }
 
   public subscribeVersions(callback: () => void): () => void {
-    // TODO Make this actually only update when versions are invalidated
+    // XXX Make this actually only update when versions are invalidated
     return this.subscribe(callback);
   }
 
@@ -1166,6 +1174,10 @@ function internalToExternalState<M extends BaseMetadata>(
     Object.values(computed.threadsById)
       .filter((thread): thread is ThreadData<M> => !thread.deletedAt)
 
+      // XXX This is sort of wiping the real bug under the carpet. The real bug
+      // XXX is that this can happen in the first place. The real fix for this
+      // XXX is to not allow this data corruption to happen in the client. And
+      // XXX also, this should not be possible to occur in the backend.
       .filter((thread) =>
         // Only keep a thread if there is at least one non-deleted comment
         thread.comments.some((c) => c.deletedAt === undefined)

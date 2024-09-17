@@ -422,7 +422,7 @@ function makeExtrasForClient<M extends BaseMetadata>(client: OpaqueClient) {
     }
   }
 
-  // TODO Hmm. All of this is stuff that should be managed by the cache. Now we have caches in different places.
+  // XXX Hmm. All of this is stuff that should be managed by the cache. Now we have caches in different places.
   const userThreadsSubscribersByQuery = new Map<string, number>();
   const userThreadsRequestsByQuery = new Map<string, Promise<unknown>>();
 
@@ -774,6 +774,7 @@ function useDeleteAllInboxNotifications_withClient(client: OpaqueClient) {
   }, [client]);
 }
 
+// XXX Should this function be a synchronous return-or-error style function? I don't see how the uSES subscription-style is useful here?
 function useInboxNotificationThread_withClient<M extends BaseMetadata>(
   client: OpaqueClient,
   inboxNotificationId: string
