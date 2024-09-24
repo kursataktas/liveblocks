@@ -16,6 +16,7 @@ import type {
 import {
   assert,
   createClient,
+  INBOX_NOTIFICATIONS_PAGE_SIZE,
   kInternal,
   makePoller,
   memoizeOnSuccess,
@@ -353,9 +354,6 @@ function makeExtrasForClient<M extends BaseMetadata>(client: OpaqueClient) {
       // remain a success, even if subsequent polls (delta updates) or page
       // fetches (for pagination) fail.
       if (isFirstFetch) {
-        // XXX Pass the page size into the URL so we will know it matches the backend!
-        const PAGE_SIZE = 6; // Must match the backend
-
         // Find the lowest date in the result, and store it to use as the next
         // page's cursor
         let cursor: Date = new Date();
@@ -370,7 +368,7 @@ function makeExtrasForClient<M extends BaseMetadata>(client: OpaqueClient) {
         const hasFetchedAll =
           result.inboxNotifications.updated.length +
             result.inboxNotifications.deleted.length <
-          PAGE_SIZE;
+          INBOX_NOTIFICATIONS_PAGE_SIZE;
 
         store.setQuery1OK({
           cursor,
