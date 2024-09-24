@@ -281,6 +281,10 @@ function makeExtrasForClient<M extends BaseMetadata>(client: OpaqueClient) {
       since: lastRequestedAt,
     });
 
+    if (lastRequestedAt === undefined || lastRequestedAt < result.requestedAt) {
+      lastRequestedAt = result.requestedAt;
+    }
+
     store.batch(() => {
       // 1️⃣
       store.updateThreadsAndNotifications(
@@ -297,10 +301,6 @@ function makeExtrasForClient<M extends BaseMetadata>(client: OpaqueClient) {
       // 2️⃣
       store.setQuery1OK();
     });
-
-    if (lastRequestedAt === undefined || lastRequestedAt < result.requestedAt) {
-      lastRequestedAt = result.requestedAt;
-    }
   }
 
   let pollerSubscribers = 0;
