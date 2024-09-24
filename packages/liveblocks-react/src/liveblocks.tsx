@@ -859,7 +859,7 @@ function useInboxNotificationThread_withClient<M extends BaseMetadata>(
   const selector = useCallback(
     (state: ReturnType<typeof getter>) => {
       const inboxNotification =
-        state.inboxNotificationsById[inboxNotificationId] ??
+        state.notificationsById[inboxNotificationId] ??
         raise(`Inbox notification with ID "${inboxNotificationId}" not found`);
 
       if (inboxNotification.kind !== "thread") {
