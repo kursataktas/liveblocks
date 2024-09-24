@@ -125,27 +125,7 @@ export function createNotificationsApi<M extends BaseMetadata>({
     return body;
   }
 
-  async function getInboxNotifications() {
-    const json = await fetchJson<{
-      threads: ThreadDataPlain<M>[];
-      inboxNotifications: InboxNotificationDataPlain[];
-      deletedThreads: ThreadDeleteInfoPlain[];
-      deletedInboxNotifications: InboxNotificationDeleteInfoPlain[];
-      meta: {
-        requestedAt: string;
-      };
-    }>(url`/v2/c/inbox-notifications`, undefined, {});
-
-    return {
-      threads: json.threads.map(convertToThreadData),
-      inboxNotifications: json.inboxNotifications.map(
-        convertToInboxNotificationData
-      ),
-      requestedAt: new Date(json.meta.requestedAt),
-    };
-  }
-
-  async function getInboxNotificationsSince(options: { since: Date }) {
+  async function getInboxNotifications(options?: { since?: Date }) {
     const json = await fetchJson<{
       threads: ThreadDataPlain<M>[];
       inboxNotifications: InboxNotificationDataPlain[];
@@ -155,7 +135,7 @@ export function createNotificationsApi<M extends BaseMetadata>({
         requestedAt: string;
       };
     }>(url`/v2/c/inbox-notifications`, undefined, {
-      since: options.since.toISOString(),
+      since: options?.since?.toISOString(),
     });
 
     return {
@@ -295,7 +275,6 @@ export function createNotificationsApi<M extends BaseMetadata>({
 
   return {
     getInboxNotifications,
-    getInboxNotificationsSince,
     getUnreadInboxNotificationsCount,
     markAllInboxNotificationsAsRead,
     markInboxNotificationAsRead,
