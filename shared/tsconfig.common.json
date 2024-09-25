@@ -1,8 +1,28 @@
 {
   "compilerOptions": {
-    // For all packages, let TypeScript use the following standardized way to
-    // resolve modules
-    "moduleResolution": "node",
+    // Every "module" option except "NodeNext" or "Preserve" is wrong
+    // "NodeNext" tells TypeScript that Node will be running the outputted
+    // files, and is slightly preferable to use than "Preserve" when building
+    // a library. The setting "Preserve" will preserve imports, assuming
+    // a bundler (like tsup, esbuild, or Rollup) will deal with them. Switching
+    // to "NodeNext" would support all scenarios, but it would require us to
+    // rewrite all existing imports to use the .js extension.
+    // ...
+    // Either set one of the following combinations:
+    // 1. "module": "Preserve", "moduleResolution": "bundler",
+    // 2. "module": "NodeNext", "moduleResolution": "NodeNext",
+    // ...
+    "moduleResolution": "node", // TODO "node" means node10 (super old), so this is definitely wrong and we should be getting rid of this as a default
+
+    // Also specify as default later
+    // "target": "es2022",
+
+    // No accidental global scripts
+    "moduleDetection": "force",
+
+    // Enable this once we're on TS 5.x for all packages
+    // Enforce "type-only" imports
+    // "verbatimModuleSyntax": true,
 
     // Don't produce *.js files when running TypeScript. We use `tsup` to
     // build our output files.
@@ -12,7 +32,7 @@
     "esModuleInterop": true, // Emit safer code for packages that use namespace/default imports
     "stripInternal": true, // Don't emit public types for things annotated with @internal
 
-    // Use better type checking
+    // Use stricter (= better) type checking
     "strict": true,
     "allowUnreachableCode": false, // False makes this stricter: errors instead of warns
     "allowUnusedLabels": false, // False makes this stricter: errors instead of warns
